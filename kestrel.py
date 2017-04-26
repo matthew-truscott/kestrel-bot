@@ -19,7 +19,9 @@ discord_logger = logging.getLogger('discord')
 discord_logger.setLevel(logging.CRITICAL)
 log = logging.getLogger()
 log.setLevel(logging.INFO)
-handler = logging.FileHandler(filename='kestrel.log', encoding='utf-8', mode='w')
+handler = logging.FileHandler(
+    filename='kestrel.log', encoding='utf-8', mode='w'
+)
 log.addHandler(handler)
 
 # args for bot
@@ -41,7 +43,9 @@ async def on_command_error(error, ctx):
     if isinstance(error, commands.CommandInvokeError):
         print('In {0.command.qualified_name}:'.format(ctx), file=sys.stderr)
         traceback.print_tb(error.original.__traceback__)
-        print('{0.__class__.__name__}: {0}'.format(error.original), file=sys.stderr)
+        print('{0.__class__.__name__}: {0}'.format(
+            error.original), file=sys.stderr
+        )
 
 
 @bot.event
@@ -69,8 +73,8 @@ async def on_command(command, ctx):
     else:
         destination = '#{0.channel.name} ({0.server.name})'.format(message)
 
-    log.info('{0.timestamp}: {0.author.name} in {1}: {0.content}'.format(message,
-                                                                         destination))
+    log.info('{0.timestamp}: {0.author.name} in {1}:'
+        '{0.content}'.format(message, destination))
 
 
 @bot.event
@@ -92,9 +96,9 @@ if __name__ == '__main__':
         try:
             bot.load_extension(extension)
         except Exception as e:
-            print('Failed to load extension {}\n{}: {}'.format(extension,
-                                                               type(e).__name__,
-                                                               e))
+            print('Failed to load extension {}\n{}: {}'.format(
+                extension, type(e).__name__, e)
+            )
 
     bot.run(credentials['discord_token'])
     handlers = log.handlers[:]
