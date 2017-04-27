@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from cogs.utils import m_parser as pa
+from utils import m_parser as pa
 from discord.ext import commands
 import random
 
@@ -8,6 +8,8 @@ import random
 class MarkovNet(object):
     ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
     DATA_DIR = os.path.join(ROOT_DIR, 'data')
+    MarkovNet.CLASSLIST = ['Noun', 'Verb', 'Adjective', 'Adverb', 'Pronoun', 'Preposition',
+        'Conjunction', 'Determiner', 'Interjection']
 
     def __init__(self, bot):
         self.undo_buffer = ''
@@ -61,12 +63,17 @@ class MarkovNet(object):
     def search_dict(self, word):
         query = self.dt_curs.execute('SELECT * FROM dictionary WHERE word=?',
                                      (word,))
-        if self.dt_curs:
+        d_list = query.fetchall()
+        #print("list is", d_list)
+        if d_list:
             d_id = []
-            for row in self.dt_curs:
+            for row in d_list:
                 d_id.append(row[0])
+                #print(row)
+            #print(word, "found", d_id)
             return d_id
         else:
+            #print(word, "not found")
             return [0]
 
     def search_id(self, wid):
@@ -90,16 +97,38 @@ class MarkovNet(object):
             return None
 
     def add_to_dict(self, word):
+        #print("adding to dictionary", word)
         self.dt_curs.execute('INSERT INTO dictionary(word) VALUES (?)',
                              (word,))
+        #self.print_dict()
+        self.dictionary.commit()
 
     def remove_from_dict(self, wid):
         self.dt_curs.execute('DELETE * FROM dictionary WHERE wID=?',
                              (wid,))
 
     def print_dict(self):
+        self.dt_curs.execute('SELECT * FROM dictionary LIMIT 1')
+        if self.dt_curs.fetchone() == None:
+            print("Dictionary is empty")
         for row in self.dt_curs.execute('SELECT * FROM dictionary ORDER BY wID'):
             print(row)
+
+    def print_dict_tostring(self, filt="None"):
+        print("trying to print " + filt + " filtered dictionary...")
+        self.dt_curs.execute('SELECT * FROM dictionary LIMIT 1')
+        if self.dt_curs.fetchone() == None:
+            return("Dictionary is empty")
+        output = ""
+        if filt == "None":
+            for row in self.dt_curs.execute('SELECT * FROM dictionary ORDER BY wID'):
+                output += str(row)
+                output += "\n"
+        elif filt == "Class":
+            for row in self.dt_curs.execute('SELECT * FROM dictionary WHERE class IS NULL'):
+                output += str(row)
+                output += "\n"
+        return output
 
     def fu_search(self, wordA, next):
         query = self.fu_curs.execute('SELECT * FROM uForwardNet WHERE wordA=? AND next=?',
@@ -130,7 +159,7 @@ class MarkovNet(object):
                                          (wi, ni, 1,))
                 else:
                     self.fu_curs.execute('UPDATE uForwardNet SET count=? WHERE wordA=? AND next=?',
-                                         (count + 1, wi, ni))
+                                         (count + 1, wi, ni,))
 
     def fu_removeone(self, wordA, next):
         for wi in self.search_dict(wordA):
@@ -254,15 +283,24 @@ class MarkovNet(object):
             print(row)
 
     def add_sentence(self, sentence):
+        #print("Adding sentence:", sentence)
+
         p_sent = pa.Parser(self.brain)
+
         fwd = p_sent.parse_sentence(1, sentence)
+        #print("Parsed forward:")
+        #print(fwd)
+
         rvs = p_sent.reverse_parse_sentence(1, sentence)
+        #print("Parsed reverse:")
+        #print(rvs)
 
         # modify network
         f_chains = fwd.split('\n')
         f_chains = f_chains[:-1]
         for c in f_chains:
             l, m, r = c.partition(p_sent.NEXT_WORD_SYMBOL)
+            #print("adding", l, r)
             self.fu_add(l, r)
         r_chains = rvs.split('\n')
         r_chains = r_chains[:-1]
@@ -343,11 +381,61 @@ class MarkovNet(object):
         out_str = out_str[1:]
         return out_str
 
+    def print_classlist_tostring(self):
+        output = ''
+        for c in MarkovNet.CLASSLIST:
+            output += c + '\n'
+        return output
+
+    def categorize(self, word="xnull", classification="xna"):
+        if word == "xnull":
+            output = ("These words have not been classified:\n"
+                + self.print_dict_tostring(filt="Class"))
+        elif self.search_dict(word)[0] == 0:
+            output = ("I don't know that word yet.\n Type classify to see the"
+                + "list of unclassified words I do know.\n")
+        elif classification == "xna":
+            output = ("These are the possible classifications:\n"
+                + self.print_classlist_tostring())
+        else:
+            for c in MarkovNet.CLASSLIST:
+                if c == classification:
+                    # if the word is unclassified, classify it
+                    found = False
+                    for res in self.search_dict(word):
+                        query = self.dt_curs.execute('SELECT * FROM dictionary WHERE wid=?',
+                                                     (res,))
+                        curr_class = query.fetchone()[0][2]
+                        print(curr_class)
+                        if not curr_class == 'None':
+                            # do nothing
+                            pass
+                        else:
+                            # update
+                            self.fu_curs.execute('UPDATE dictionary SET class=? WHERE wid=?',
+                                                 (classification, res,))
+                            output = ("found an unclassified instance, updated in dictionary")
+                            found = True
+                    if not found:
+                        # no unclassified, add
+                        self.dt_curs.execute('INSERT INTO dictionary(word, class) VALUES (?, ?)',
+                                             (word, classification,))
+                        output = ("didn't find an unclassified instance, added to dictionary")
+        self.dictionary.commit()
+        print(output)
+        return output
+
+
     @commands.command(hidden=True)
     async def train(self, *, message: str):
         self.add_sentence(message)
         self.undo_buffer = message
         await self.bot.say('Sentence learned, to undo type !undo.')
+
+    @commands.command(hidden=True)
+    async def classify(self, word="xnull", classification="xna"):
+        output = self.categorize(word, classification)
+        await self.bot.say(output)
 
     @commands.command(hidden=True)
     async def show(self, sarg):
@@ -375,6 +463,4 @@ def setup(bot):
 if __name__ == '__main__':
     mn = MarkovNet('test')
     mn.print_dict()
-    mn.fu_print()
-    print(mn.u_random_walk())
-    mn.close_net()
+    mn.categorize("hello")

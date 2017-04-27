@@ -11,7 +11,7 @@ ROOT_DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(ROOT_DIR, 'data')
 
 initial_extensions = [
-    'cogs.images',
+    'cogs.images', 'cogs.nlp_markov'
 ]
 
 # setup log file
