@@ -1,4 +1,5 @@
 import os
+import errno
 import sqlite3
 from utils import m_parser as pa
 from discord.ext import commands
@@ -8,13 +9,14 @@ import random
 class MarkovNet(object):
     ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
     DATA_DIR = os.path.join(ROOT_DIR, 'data')
-    MarkovNet.CLASSLIST = ['Noun', 'Verb', 'Adjective', 'Adverb', 'Pronoun', 'Preposition',
-        'Conjunction', 'Determiner', 'Interjection']
+    CLASSLIST = ['NOUN', 'VERB', 'ADJECTIVE', 'ADVERB', 'PRONOUN', 'PREPOSITION',
+        'CONJUNCTION', 'DETERMINER', 'INTERJECTION', 'CONTRACTION']
 
     def __init__(self, bot):
         self.undo_buffer = ''
         self.bot = bot
         self.brain = 'test'
+        flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
 
         '''
         There are a lot of databases to be created, one pair for each gram. If we want to
@@ -26,6 +28,8 @@ class MarkovNet(object):
         self.dictionary = sqlite3.connect(os.path.join(MarkovNet.DATA_DIR, self.brain + '_dict.db'))
         self.fu_list = sqlite3.connect(os.path.join(MarkovNet.DATA_DIR, self.brain + '_fu.db'))
         self.ru_list = sqlite3.connect(os.path.join(MarkovNet.DATA_DIR, self.brain + '_ru.db'))
+
+        self.contractions = os.path.join(MarkovNet.DATA_DIR, self.brain + '_cntr.csv')
 
         self.dt_curs = self.dictionary.cursor()
         self.fu_curs = self.fu_list.cursor()
@@ -59,6 +63,19 @@ class MarkovNet(object):
                                 FOREIGN KEY(prev) REFERENCES dictionary(wID)
                              )
                              ''')
+
+        try:
+            file_handle = os.open(self.contractions, flags)
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                # failed as the file already exists
+                pass
+            else:
+                # something unexpected went wrong so reraise the exception
+                raise
+        else:
+            pass
+            # for now
 
     def search_dict(self, word):
         query = self.dt_curs.execute('SELECT * FROM dictionary WHERE word=?',
@@ -104,7 +121,7 @@ class MarkovNet(object):
         self.dictionary.commit()
 
     def remove_from_dict(self, wid):
-        self.dt_curs.execute('DELETE * FROM dictionary WHERE wID=?',
+        self.dt_curs.execute('DELETE FROM dictionary WHERE wID=?',
                              (wid,))
 
     def print_dict(self):
@@ -287,11 +304,11 @@ class MarkovNet(object):
 
         p_sent = pa.Parser(self.brain)
 
-        fwd = p_sent.parse_sentence(1, sentence)
+        fwd = p_sent.parse_sentence(1, sentence)['parsed']
         #print("Parsed forward:")
         #print(fwd)
 
-        rvs = p_sent.reverse_parse_sentence(1, sentence)
+        rvs = p_sent.reverse_parse_sentence(1, sentence)['parsed']
         #print("Parsed reverse:")
         #print(rvs)
 
@@ -314,8 +331,8 @@ class MarkovNet(object):
 
     def delete_sentence(self, sentence):
         p_sent = pa.Parser(self.brain)
-        fwd = p_sent.parse_sentence(1, sentence)
-        rvs = p_sent.reverse_parse_sentence(1, sentence)
+        fwd = p_sent.parse_sentence(1, sentence)['parsed']
+        rvs = p_sent.reverse_parse_sentence(1, sentence)['parsed']
 
         # modify network
         # modify network
@@ -399,28 +416,33 @@ class MarkovNet(object):
                 + self.print_classlist_tostring())
         else:
             for c in MarkovNet.CLASSLIST:
-                if c == classification:
+                if c == classification.upper():
                     # if the word is unclassified, classify it
                     found = False
                     for res in self.search_dict(word):
                         query = self.dt_curs.execute('SELECT * FROM dictionary WHERE wid=?',
                                                      (res,))
-                        curr_class = query.fetchone()[0][2]
+                        curr_class = query.fetchone()[2]
                         print(curr_class)
-                        if not curr_class == 'None':
+                        if not curr_class is None:
                             # do nothing
                             pass
                         else:
                             # update
-                            self.fu_curs.execute('UPDATE dictionary SET class=? WHERE wid=?',
-                                                 (classification, res,))
+                            self.dt_curs.execute('UPDATE dictionary SET class=? WHERE wid=?',
+                                                 (c, res,))
                             output = ("found an unclassified instance, updated in dictionary")
                             found = True
                     if not found:
+                        if curr_class == c:
+                            # exists already, do nothing
+                            output = ("found a classified instance, no action taken")
+                            pass
+                        else:
                         # no unclassified, add
-                        self.dt_curs.execute('INSERT INTO dictionary(word, class) VALUES (?, ?)',
-                                             (word, classification,))
-                        output = ("didn't find an unclassified instance, added to dictionary")
+                            self.dt_curs.execute('INSERT INTO dictionary(word, class) VALUES (?, ?)',
+                                                 (word, c,))
+                            output = ("didn't find an unclassified instance, added to dictionary")
         self.dictionary.commit()
         print(output)
         return output
@@ -463,4 +485,5 @@ def setup(bot):
 if __name__ == '__main__':
     mn = MarkovNet('test')
     mn.print_dict()
-    mn.categorize("hello")
+
+    mn.categorize("hello", "interjection")

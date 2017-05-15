@@ -1,5 +1,5 @@
 import re
-
+from enums import e_modify as mo
 
 class Parser:
     WORD_BREAK_SYMBOL = '^'
@@ -12,6 +12,14 @@ class Parser:
         self.word_split_char = word_split_char
         self.whitespace_regex = re.compile('\s+')
         self.content = ''
+
+    def parse_word(self, word):
+        extremities = True
+        exc_count = 0
+        que_count = 0
+        while extremities:
+            if word[-1:] == '!':
+
 
     def parse_sentence(self, depth, sentence):
         sent = sentence.split(self.word_split_char)
@@ -27,7 +35,8 @@ class Parser:
                         if sent[w + d - depth].lower() == "i":
                             line += "I" + self.WORD_BREAK_SYMBOL
                         else:
-                            line += (sent[w + d - depth].lower() + self.WORD_BREAK_SYMBOL)
+                            line += (parse_word(sent[w + d - depth].lower())
+                                + self.WORD_BREAK_SYMBOL)
                 line = line[:-1]
                 if w >= len(sent):
                     line += self.NEXT_WORD_SYMBOL + 'terminus' + '\n'
@@ -37,7 +46,7 @@ class Parser:
                     else:
                         line += (self.NEXT_WORD_SYMBOL +
                                  sent[w].lower() + '\n')
-        return line
+        return {'parsed': line, 'mod': mod}
 
     def reverse_parse_sentence(self, depth, sentence):
         sent = sentence.split(self.word_split_char)
@@ -65,4 +74,4 @@ class Parser:
                     else:
                         line += (self.NEXT_WORD_SYMBOL +
                                  sent[w].lower() + '\n')
-        return line
+        return {'parsed': line, 'mod': mod}
