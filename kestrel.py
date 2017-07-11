@@ -11,7 +11,7 @@ ROOT_DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(ROOT_DIR, 'data')
 
 initial_extensions = [
-    'cogs.images', 'cogs.nlp_markov'
+    'cogs.core', 'cogs.images', 'cogs.nlp_markov'
 ]
 
 # setup log file
@@ -25,7 +25,7 @@ handler = logging.FileHandler(
 log.addHandler(handler)
 
 # args for bot
-prefix = '!'
+prefix = 'k.'
 description = """
 Hello! This is Kess, your multi-talented utility bot.
 """

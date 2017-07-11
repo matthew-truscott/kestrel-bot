@@ -1,5 +1,5 @@
 import re
-from enums import e_modify as mo
+from cogs.enums import e_modify as mo
 
 class Parser:
     WORD_BREAK_SYMBOL = '^'
@@ -19,11 +19,20 @@ class Parser:
         que_count = 0
         while extremities:
             if word[-1:] == '!':
+                exc_count += 1
+            elif word[-1:] == '?':
+                que_count += 1
+            else:
+                extremities = False
+        #if exc_count == 0 && que_count == 0:
+        return word
+
 
 
     def parse_sentence(self, depth, sentence):
         sent = sentence.split(self.word_split_char)
         line = ''
+        mod = ''
         if len(sent) > depth:
             for w in range(len(sent) + depth):
                 for d in range(depth):
@@ -35,7 +44,7 @@ class Parser:
                         if sent[w + d - depth].lower() == "i":
                             line += "I" + self.WORD_BREAK_SYMBOL
                         else:
-                            line += (parse_word(sent[w + d - depth].lower())
+                            line += (self.parse_word(sent[w + d - depth].lower())
                                 + self.WORD_BREAK_SYMBOL)
                 line = line[:-1]
                 if w >= len(sent):
@@ -52,6 +61,7 @@ class Parser:
         sent = sentence.split(self.word_split_char)
         sent.reverse()
         line = ''
+        mod = ''
         if len(sent) > depth:
             for w in range(len(sent) + depth):
                 for d in range(depth):

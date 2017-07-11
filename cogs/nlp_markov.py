@@ -1,7 +1,7 @@
 import os
 import errno
 import sqlite3
-from utils import m_parser as pa
+from cogs.utils import m_parser as pa
 from discord.ext import commands
 import random
 
