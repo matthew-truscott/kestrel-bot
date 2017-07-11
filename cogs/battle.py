@@ -62,7 +62,8 @@ class BattleSim(object):
 
     def nextTurn(self, time):
         #to move or not to move, energy loss, dead?
-
+        for idx, person in enumerate(self.p_ch):
+            print(self.p_pos[idx])
         #discovery, person or event
         #gather, prepare, eat
 
@@ -87,4 +88,4 @@ if __name__ == '__main__':
     b = BattleSim(1)
     b.makeBattle()
     b.printMap()
-    b.getCharFromMap(1, 1)
+    b.nextTurn(1)
