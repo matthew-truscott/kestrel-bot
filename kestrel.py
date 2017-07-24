@@ -11,7 +11,7 @@ ROOT_DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(ROOT_DIR, 'data')
 
 initial_extensions = [
-    'cogs.core', 'cogs.images', 'cogs.nlp_markov'
+    'cogs.core', 'cogs.images', 'cogs.im_edits', 'cogs.animu'
 ]
 
 # setup log file
@@ -74,7 +74,7 @@ async def on_command(command, ctx):
         destination = '#{0.channel.name} ({0.server.name})'.format(message)
 
     log.info('{0.timestamp}: {0.author.name} in {1}:'
-        '{0.content}'.format(message, destination))
+             '{0.content}'.format(message, destination))
 
 
 @bot.event
@@ -88,6 +88,7 @@ async def on_message(message):
 def load_credentials():
     with open(os.path.join(DATA_DIR, 'credentials.json')) as f:
         return json.load(f)
+
 
 if __name__ == '__main__':
     credentials = load_credentials()
