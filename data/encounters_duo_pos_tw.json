@@ -1,0 +1,20 @@
+encounters_duo_pos_tw = {
+  "cuddle":
+  {
+    "name": "cuddle",
+    "energy": ["2", "2"],
+    "warmth": ["4", "4"],
+    "sanity": ["1", "1"],
+    "health": ["0", "0"],
+    "message": "%1 cuddles with %2"
+  },
+  "watch":
+  {
+    "name": "watch",
+    "energy": ["2", "2"],
+    "warmth": ["1", "1"],
+    "sanity": ["1", "1"],
+    "health": ["0", "0"],
+    "message": "%1 and %2 take guard shifts while the other sleeps"
+  }
+}

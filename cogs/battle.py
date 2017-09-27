@@ -3,6 +3,7 @@ import os
 import sys
 import csv
 import random
+import json
 import game.character as gc
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -18,6 +19,7 @@ class BattleSim(object):
 
         self.testing = testing
         self.p_ch = []
+        self.time = 0
         self.map = [[-1 for x in range(self.mapWidth)]
                     for y in range(self.mapHeight)]
         self.rel_matrix = []
@@ -66,15 +68,25 @@ class BattleSim(object):
         print(', '.join(outList))
         return outList
 
+    def friendly_encounter(person1, person2):
+        if self.time % 4 == 0:
+            # night
+            with open(os.path.join(DATA_DIR, 'encounters_duo_pos_tw.json')) as f:
+                event_obj = json.load(f)
+            
+
     def interact(self, personList):
         participants = len(personList)
         if participants == 2:
-            rel_score = self.rel_matrix[personList[0]][personList[1]]
-            if rel_score > 10:
-                # friendly encounter
-                
+            encounter_chance = random.random()
+            if encounter_chance < 0.9:
+                rel_score = self.rel_matrix[personList[0]][personList[1]]
+                if rel_score > 10:
+                    # friendly encounter
+                    friendly_encounter(personList[0], personList[1])
 
-    def nextTurn(self, time):
+    def nextTurn(self):
+        self.time += 1
         p_move = 0.6
 
         # to move or not to move, energy loss, dead?
