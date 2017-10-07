@@ -84,6 +84,35 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
+@bot.event
+async def on_member_join(member):
+    print("%s joined the server" % (member.name))
+
+    with open(os.path.join(DATA_DIR, 'userbase.json'), 'r+') as f:
+        data = json.load(f)
+
+        userExists = False
+        for key, value in data.items():
+            if key == member.id:
+                userExists = True
+        if not userExists:
+            # add user data
+            data[member.id] = {
+                "name": member.name,
+                "isbot": member.bot,
+                "avatar": member.avatar_url,
+                "created": member.created_at.strftime("%Y, %B %d"),
+                "display name": member.display_name,
+                "joined at": member.joined_at.strftime("%Y, %B %d")
+            }
+        f.seek(0)
+        json.dump(data, f, indent=4)
+        f.truncate()
+
+@bot.event
+async def on_member_remove(member):
+    print("%s left the server" % (member.name))
+
 
 def load_credentials():
     with open(os.path.join(DATA_DIR, 'credentials.json')) as f:
