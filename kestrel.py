@@ -9,6 +9,7 @@ from discord.ext import commands
 
 ROOT_DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(ROOT_DIR, 'data')
+CREDENTIALS_DIR = os.path.join(ROOT_DIR, '.credentials')
 
 initial_extensions = [
     'cogs.core', 'cogs.images', 'cogs.im_edits', 'cogs.animu'
@@ -115,7 +116,7 @@ async def on_member_remove(member):
 
 
 def load_credentials():
-    with open(os.path.join(DATA_DIR, 'credentials.json')) as f:
+    with open(os.path.join(CREDENTIALS_DIR, 'credentials.json')) as f:
         return json.load(f)
 
 

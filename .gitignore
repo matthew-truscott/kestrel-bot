@@ -1,3 +1,2 @@
 ﻿.idea*
-data/credentials.json
-data/client_secret.json
+.credentials/*

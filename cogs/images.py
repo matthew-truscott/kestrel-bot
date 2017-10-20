@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 DATA_DIR = os.path.join(ROOT_DIR, 'data')
+CREDENTIALS_DIR = os.path.join(ROOT_DIR, '.credentials')
 
 class ImageCog(object):
     def __init__(self, bot):
@@ -66,7 +67,7 @@ class ImageCog(object):
             pass
 
 def load_credentials():
-    with open(os.path.join(DATA_DIR, 'credentials.json')) as f:
+    with open(os.path.join(CREDENTIALS_DIR, 'credentials.json')) as f:
         return json.load(f)
 
 def setup(bot):
