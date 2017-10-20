@@ -11,7 +11,7 @@ class CoreCog(object):
 
     @commands.command(hidden=True)
     async def quit(self):
-        sys.exit()
+        bot.logout()
 
 def setup(bot):
     bot.add_cog(CoreCog(bot))

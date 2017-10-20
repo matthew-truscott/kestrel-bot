@@ -7,9 +7,26 @@ import json
 from collections import Counter
 from discord.ext import commands
 
+
+def load_credentials():
+    with open(os.path.join(CREDENTIALS_DIR, 'credentials.json')) as f:
+        return json.load(f)
+
+
+def load_persistence():
+    with open(os.path.join(DATA_DIR, 'persistence.json'), 'r+') as f:
+        return json.load(f)
+
+
 ROOT_DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(ROOT_DIR, 'data')
+MESSAGE_DIR = os.path.join(ROOT_DIR, 'message')
 CREDENTIALS_DIR = os.path.join(ROOT_DIR, '.credentials')
+JSON_LIMIT = 1000
+JSON_COUNTER = 0
+persistence = load_persistence()
+JSON_MESSAGE = int(persistence['message_count'])
+message_dict = {}
 
 initial_extensions = [
     'cogs.core', 'cogs.images', 'cogs.im_edits', 'cogs.animu'
@@ -80,10 +97,37 @@ async def on_command(command, ctx):
 
 @bot.event
 async def on_message(message):
-    if message.author.bot:
+    if not message.author.bot:
+        global JSON_COUNTER
+        global JSON_MESSAGE
+        global message_dict
+        if JSON_COUNTER < JSON_LIMIT:
+            JSON_COUNTER += 1
+        else:
+            JSON_COUNTER = 0
+            JSON_MESSAGE += 1
+            persistence['message_count'] = "%i" % (JSON_MESSAGE)
+            path = os.path.join(MESSAGE_DIR,
+                                'messagelog%i.json' % (JSON_MESSAGE))
+            with open(path, 'w+') as fl:
+                json.dump(message_dict, fl)
+            message_dict = {}
+        entry = "entry-%i-%i" % (JSON_MESSAGE, JSON_COUNTER)
+        message_dict[entry] = {
+            "channel": message.channel.name,
+            "timestamp": str(message.timestamp),
+            "author": message.author.name,
+            "contents": message.content
+        }
+        path = os.path.join(MESSAGE_DIR,
+                            'messagelog%i.json' % (JSON_MESSAGE))
+        with open(path, 'w+') as fl:
+            json.dump(message_dict, fl)
+    else:
         return
 
     await bot.process_commands(message)
+
 
 @bot.event
 async def on_member_join(member):
@@ -110,14 +154,18 @@ async def on_member_join(member):
         json.dump(data, f, indent=4)
         f.truncate()
 
+
 @bot.event
 async def on_member_remove(member):
     print("%s left the server" % (member.name))
 
 
-def load_credentials():
-    with open(os.path.join(CREDENTIALS_DIR, 'credentials.json')) as f:
-        return json.load(f)
+@commands.command(hidden=True)
+async def quit(self):
+    path = os.path.join(MESSAGE_DIR, 'messagelog%i' % (JSON_MESSAGE))
+    with open(path, 'w') as fl:
+        json.dump(message_dict, fl)
+    sys.exit()
 
 
 if __name__ == '__main__':

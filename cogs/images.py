@@ -9,6 +9,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 DATA_DIR = os.path.join(ROOT_DIR, 'data')
 CREDENTIALS_DIR = os.path.join(ROOT_DIR, '.credentials')
 
+
 class ImageCog(object):
     def __init__(self, bot):
         self.credentials = load_credentials()
