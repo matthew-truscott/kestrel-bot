@@ -15,7 +15,16 @@ def load_credentials():
 
 def load_persistence():
     with open(os.path.join(DATA_DIR, 'persistence.json'), 'r+') as f:
-        return json.load(f)
+        pers_dict = json.load(f)
+        int_message = int(pers_dict['message_count'])
+        int_message += 1
+        pers_dict['message_count'] = "%i" % (int_message)
+
+        f.seek(0)
+        json.dump(pers_dict, f, indent=4)
+        f.truncate()
+
+        return pers_dict
 
 
 ROOT_DIR = os.path.dirname(__file__)
@@ -27,9 +36,11 @@ JSON_COUNTER = 0
 persistence = load_persistence()
 JSON_MESSAGE = int(persistence['message_count'])
 message_dict = {}
+RECORD_MESSAGES = False
 
 initial_extensions = [
-    'cogs.core', 'cogs.images', 'cogs.im_edits', 'cogs.animu'
+    'cogs.core', 'cogs.images', 'cogs.im_edits', 'cogs.animu',
+    'cogs.modactions'
 ]
 
 # setup log file
@@ -98,31 +109,43 @@ async def on_command(command, ctx):
 @bot.event
 async def on_message(message):
     if not message.author.bot:
-        global JSON_COUNTER
-        global JSON_MESSAGE
-        global message_dict
-        if JSON_COUNTER < JSON_LIMIT:
-            JSON_COUNTER += 1
-        else:
-            JSON_COUNTER = 0
-            JSON_MESSAGE += 1
-            persistence['message_count'] = "%i" % (JSON_MESSAGE)
+        if RECORD_MESSAGES:
+            global JSON_COUNTER
+            global JSON_MESSAGE
+            global message_dict
+
+            if JSON_COUNTER < JSON_LIMIT:
+                JSON_COUNTER += 1
+                #persistence['index'] = "%i" % (JSON_COUNTER)
+
+            else:
+                JSON_COUNTER = 0
+                #persistence['index'] = "%i" % (JSON_COUNTER)
+
+                JSON_MESSAGE += 1
+                persistence['message_count'] = "%i" % (JSON_MESSAGE)
+
+                per_path = os.path.join(DATA_DIR, 'persistence.json')
+                with open(per_path, 'w') as fp:
+                    json.dump(persistence, fp)
+
+                path = os.path.join(MESSAGE_DIR,
+                                    'messagelog%i.json' % (JSON_MESSAGE))
+                with open(path, 'w+') as fl:
+                    json.dump(message_dict, fl)
+                message_dict = {}
+
+            entry = "entry-%i-%i" % (JSON_MESSAGE, JSON_COUNTER)
+            message_dict[entry] = {
+                "channel": message.channel.name,
+                "timestamp": str(message.timestamp),
+                "author": message.author.name,
+                "contents": message.content
+            }
             path = os.path.join(MESSAGE_DIR,
                                 'messagelog%i.json' % (JSON_MESSAGE))
             with open(path, 'w+') as fl:
                 json.dump(message_dict, fl)
-            message_dict = {}
-        entry = "entry-%i-%i" % (JSON_MESSAGE, JSON_COUNTER)
-        message_dict[entry] = {
-            "channel": message.channel.name,
-            "timestamp": str(message.timestamp),
-            "author": message.author.name,
-            "contents": message.content
-        }
-        path = os.path.join(MESSAGE_DIR,
-                            'messagelog%i.json' % (JSON_MESSAGE))
-        with open(path, 'w+') as fl:
-            json.dump(message_dict, fl)
     else:
         return
 
@@ -139,6 +162,7 @@ async def on_member_join(member):
         userExists = False
         for key, value in data.items():
             if key == member.id:
+                data[member.id]["alive"] = True
                 userExists = True
         if not userExists:
             # add user data
@@ -148,7 +172,8 @@ async def on_member_join(member):
                 "avatar": member.avatar_url,
                 "created": member.created_at.strftime("%Y, %B %d"),
                 "display name": member.display_name,
-                "joined at": member.joined_at.strftime("%Y, %B %d")
+                "joined at": member.joined_at.strftime("%Y, %B %d"),
+                "alive": True
             }
         f.seek(0)
         json.dump(data, f, indent=4)
@@ -169,6 +194,10 @@ async def quit(self):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        if sys.argv[1] == '-w':
+            RECORD_MESSAGES = True
+
     credentials = load_credentials()
     bot.commands_used = Counter()
     for extension in initial_extensions:

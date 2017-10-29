@@ -7,5 +7,32 @@
         "created": "2016, May 07",
         "display name": "Iris",
         "joined at": "2017, October 07"
+    },
+    "134411181510098945": {
+        "name": "Ragnamus",
+        "isbot": false,
+        "avatar": "https://cdn.discordapp.com/avatars/134411181510098945/6a00f07a6a6f1cf594e8b564d438b401.webp?size=1024",
+        "created": "2016, January 06",
+        "display name": "Ragnamus",
+        "joined at": "2017, October 29",
+        "alive": true
+    },
+    "301464304694329354": {
+        "name": "Akharis",
+        "isbot": false,
+        "avatar": "https://cdn.discordapp.com/avatars/301464304694329354/d59cdf36bfc35309fd121871302b2d87.webp?size=1024",
+        "created": "2017, April 11",
+        "display name": "Akharis",
+        "joined at": "2017, October 29",
+        "alive": true
+    },
+    "306916536793169920": {
+        "name": "kestrel-bot",
+        "isbot": true,
+        "avatar": "https://cdn.discordapp.com/avatars/306916536793169920/640ed069aaefd83edce91b309c223f39.webp?size=1024",
+        "created": "2017, April 26",
+        "display name": "kestrel-bot",
+        "joined at": "2017, October 29",
+        "alive": false
     }
 }
