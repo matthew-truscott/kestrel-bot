@@ -15,7 +15,7 @@ class ImageCog(object):
         self.credentials = load_credentials()
         self.bot = bot
         self.reddit_obj = praw.Reddit(
-            user_agent='kestrel-discord by u/_Pseudos_ ver 0.2',
+            user_agent='kestrel-discord by /u/kestrel_bot ver 0.1',
             client_id=self.credentials['reddit_id'],
             client_secret=self.credentials['reddit_secret'],
             password=self.credentials['reddit_password'],

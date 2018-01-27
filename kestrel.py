@@ -39,8 +39,7 @@ message_dict = {}
 RECORD_MESSAGES = False
 
 initial_extensions = [
-    'cogs.core', 'cogs.images', 'cogs.im_edits', 'cogs.animu',
-    'cogs.modactions'
+    'cogs.core', 'cogs.modactions'
 ]
 
 # setup log file
