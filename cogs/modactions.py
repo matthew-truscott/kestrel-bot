@@ -12,11 +12,11 @@ class ModCog(object):
         self.bot = bot
         with open(os.path.join(DATA_DIR, 'userbase.json'), 'r') as f:
             self.userbase = json.load(f)
-        with open(os.path.join(DATA_DIR, 'perms_cache.json'), 'r') as f:
-            perms_cache = json.load(f)
-        self._perms_cache = defaultdict(dict, perms_cache)
-        self.ban_message = 'ban'
-        self.softban_message = 'softban'
+        # with open(os.path.join(DATA_DIR, 'perms_cache.json'), 'r') as f:
+        #     perms_cache = json.load(f)
+        # self._perms_cache = defaultdict(dict, perms_cache)
+        # self.ban_message = 'ban'
+        # self.softban_message = 'softban'
 
     @commands.command(pass_context=True)
     @commands.has_role("god")
