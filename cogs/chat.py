@@ -10,10 +10,6 @@ class ChatCog(object):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True)
-    async def quit(self):
-        sys.exit()
-
 
 def setup(bot):
     bot.add_cog(CoreCog(bot))

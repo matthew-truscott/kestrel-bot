@@ -124,6 +124,43 @@ After you are sorted you may join clubs, roles, and projects.
 
     @commands.command(pass_context=True)
     @commands.has_role(god)
+    async def postrules(self, ctx):
+        chid = ctx.message.channel
+        cm = '''
+            ```Markdown
+1. Do not display discrimination, prejudice, or hateful rhetoric towards *any group*, even 'playfully'.
+2. Keep your language classy - offensive terms are prohibited.
+3. No advertising of any kind without permission.
+4. Do not be an asshole - there is a system for complaints.
+5. Do not post, link to, or reference any material that goes against the Official Discord Content rules.
+            ```
+             '''
+        await self.bot.send_message(chid, cm)
+
+    @commands.command(pass_context=True)
+    @commands.has_role(god)
+    async def postclubs(self, ctx):
+        chid = ctx.message.channel
+        cm = '''
+            ```Markdown
+*Club List*
+The following clubs are currently active:
+Gaming Club
+Writers Club
+
+*Activities List*
+The following activities are currently active:
+Ribbon Cutting
+
+*Fun List*
+We have holidays, activities, competitions, and events which are all scheduled
+ahead of time. Current information can be found under the SERVERWIDE category.
+            ```
+             '''
+        await self.bot.send_message(chid, cm)
+
+    @commands.command(pass_context=True)
+    @commands.has_role(god)
     async def welcomelink1(self, ctx):
         chid = ctx.message.channel
         await self.bot.send_message(chid, 'https://goo.gl/forms/JF35YL5wBGbRta912')
