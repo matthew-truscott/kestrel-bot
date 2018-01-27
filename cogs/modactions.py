@@ -108,17 +108,14 @@ class ModCog(object):
     async def welcomemessage(self, ctx):
         chid = ctx.message.channel
         cm = '''
-            ```Markdown
-Welcome to The Foundry!
+*Welcome to The Foundry!*
 
 To get started, please begin the following sorting process,
-[1] https://goo.gl/forms/JF35YL5wBGbRta912
-[2] https://goo.gl/forms/k75LCpCs61mUyumx2
+https://goo.gl/forms/2Fq6Pnvab9DUCJWB2
 
 The possible houses are Elaassar, Lowry, Scriabin, and Kishimoto.
 
 After you are sorted you may join clubs, roles, and projects.
-            ```
              '''
         await self.bot.send_message(chid, cm)
 
@@ -127,13 +124,11 @@ After you are sorted you may join clubs, roles, and projects.
     async def postrules(self, ctx):
         chid = ctx.message.channel
         cm = '''
-            ```Markdown
 1. Do not display discrimination, prejudice, or hateful rhetoric towards *any group*, even 'playfully'.
 2. Keep your language classy - offensive terms are prohibited.
 3. No advertising of any kind without permission.
 4. Do not be an asshole - there is a system for complaints.
 5. Do not post, link to, or reference any material that goes against the Official Discord Content rules.
-            ```
              '''
         await self.bot.send_message(chid, cm)
 
@@ -142,7 +137,6 @@ After you are sorted you may join clubs, roles, and projects.
     async def postclubs(self, ctx):
         chid = ctx.message.channel
         cm = '''
-            ```Markdown
 *Club List*
 The following clubs are currently active:
 Gaming Club
@@ -155,7 +149,6 @@ Ribbon Cutting
 *Fun List*
 We have holidays, activities, competitions, and events which are all scheduled
 ahead of time. Current information can be found under the SERVERWIDE category.
-            ```
              '''
         await self.bot.send_message(chid, cm)
 
