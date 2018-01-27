@@ -19,14 +19,14 @@ class ModCog(object):
         self.softban_message = 'softban'
 
     @commands.command(pass_context=True)
-    @commands.has_role(god)
+    @commands.has_role("god")
     async def serverlist(self, ctx):
         chid = ctx.message.channel
         for server in self.bot.servers:
             await self.bot.send_message(chid, server.name)
 
     @commands.command(pass_context=True)
-    @commands.has_role(god)
+    @commands.has_role("god")
     async def memberlist(self, ctx):
         chid = ctx.message.channel
         desc = ""
@@ -39,7 +39,7 @@ class ModCog(object):
         await self.bot.send_message(chid, embed=em)
 
     @commands.command(pass_context=True)
-    @commands.has_role(god)
+    @commands.has_role("god")
     async def update_members(self, ctx):
         for member in self.bot.get_all_members():
             if ctx.message.server == member.server:
@@ -67,7 +67,7 @@ class ModCog(object):
 
 
     @commands.command(pass_context=True)
-    @commands.has_role(god)
+    @commands.has_role("god")
     async def clean_members(self, ctx):
         for key, value in self.userbase.items():
             userExists = False
@@ -85,7 +85,7 @@ class ModCog(object):
 
 
     @commands.command(pass_context=True)
-    @commands.has_role(god)
+    @commands.has_role("god")
     async def embedtest(self, ctx):
         chid = ctx.message.channel
         em = discord.Embed(type='rich',
@@ -97,14 +97,14 @@ class ModCog(object):
         await self.bot.send_message(chid, embed=em)
 
     @commands.command(pass_context=True)
-    @commands.has_role(god)
+    @commands.has_role("god")
     async def codetest(self, ctx):
         chid = ctx.message.channel
         cm = '```test```'
         await self.bot.send_message(chid, cm)
 
     @commands.command(pass_context=True)
-    @commands.has_role(god)
+    @commands.has_role("god")
     async def welcomemessage(self, ctx):
         chid = ctx.message.channel
         cm = '''
@@ -123,7 +123,7 @@ After you are sorted you may join clubs, roles, and projects.
         await self.bot.send_message(chid, cm)
 
     @commands.command(pass_context=True)
-    @commands.has_role(god)
+    @commands.has_role("god")
     async def postrules(self, ctx):
         chid = ctx.message.channel
         cm = '''
@@ -138,7 +138,7 @@ After you are sorted you may join clubs, roles, and projects.
         await self.bot.send_message(chid, cm)
 
     @commands.command(pass_context=True)
-    @commands.has_role(god)
+    @commands.has_role("god")
     async def postclubs(self, ctx):
         chid = ctx.message.channel
         cm = '''
@@ -160,19 +160,19 @@ ahead of time. Current information can be found under the SERVERWIDE category.
         await self.bot.send_message(chid, cm)
 
     @commands.command(pass_context=True)
-    @commands.has_role(god)
+    @commands.has_role("god")
     async def welcomelink1(self, ctx):
         chid = ctx.message.channel
         await self.bot.send_message(chid, 'https://goo.gl/forms/JF35YL5wBGbRta912')
 
     @commands.command(pass_context=True)
-    @commands.has_role(god)
+    @commands.has_role("god")
     async def welcomelink2(self, ctx):
         chid = ctx.message.channel
         await self.bot.send_message(chid, 'https://goo.gl/forms/k75LCpCs61mUyumx2')
 
     # @commands.command(pass_context=True)
-    # @commands.has_role(god)
+    # @commands.has_role("god")
     # async def ban(self, ctx, user: discord.Member, days: str = None, *,
     #               reason: str = None):
     #     author = ctx.message.author
@@ -204,7 +204,7 @@ ahead of time. Current information can be found under the SERVERWIDE category.
     #         print(e)
     #
     # @commands.command(pass_context=True)
-    # @commands.has_role(god)
+    # @commands.has_role("god")
     # async def softban(self, ctx, user: discord.Member, *, reason: str = None):
     #     server = ctx.message.server
     #     channel = ctx.message.channel
@@ -236,12 +236,12 @@ ahead of time. Current information can be found under the SERVERWIDE category.
     #         await self.bot.say("I'm not allowed to do that.")
     #
     # @commands.group(pass_context=True, no_pm=True, invoke_without_command=True)
-    # @commands.has_role(god)
+    # @commands.has_role("god")
     # async def mute(self, ctx, user: discord.Member, * reason: str = None):
     #     if ctx.invoked_subcommand is None:
     #         await ctx.invoke(self.channel_mute, user=user, reason=reason)
     #
-    # @commands.has_role(god)
+    # @commands.has_role("god")
     # @mute.command(name="channel", pass_context=True, no_pm=True)
     # async def channel_mute(self, ctx, user: discord.Member, *, reason: str = None):
     #     author = ctx.message.author
@@ -263,7 +263,7 @@ ahead of time. Current information can be found under the SERVERWIDE category.
     #             json.dump(self._perms_cache, f)
     #         await self.bot.say("User has been muted in this channel.")
     #
-    # @commands.has_role(god)
+    # @commands.has_role("god")
     # @mute.command(name="server", pass_context=True, no_pm=True)
     # async def server_mute(self, ctx, user: discord.Member, *, reason: str = None):
     #     author = ctx.message.author
@@ -294,12 +294,12 @@ ahead of time. Current information can be found under the SERVERWIDE category.
     #     await self.bot.say("User has been muted in this server.")
     #
     # @commands.group(pass_context=True, no_pm=True, invoke_without_command=True)
-    # @commands.has_role(god)
+    # @commands.has_role("god")
     # async def unmute(self, ctx, user: discord.Member, * reason: str = None):
     #     if ctx.invoked_subcommand is None:
     #         await ctx.invoke(self.channel_unmute, user=user)
     #
-    # @commands.has_role(god)
+    # @commands.has_role("god")
     # @mute.command(name="channel", pass_context=True, no_pm=True)
     # async def channel_mute(self, ctx, user: discord.Member):
     #     author = ctx.message.author
@@ -334,7 +334,7 @@ ahead of time. Current information can be found under the SERVERWIDE category.
     #             json.dump(self._perms_cache, f)
     #         await self.bot.say("User has been unmuted.")
     #
-    # @commands.has_role(god)
+    # @commands.has_role("god")
     # @mute.command(name="server", pass_context=True, no_pm=True)
     # async def server_mute(self, ctx, user: discord.Member, *, reason: str = None):
     #     author = ctx.message.author
