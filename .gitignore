@@ -1,5 +1,5 @@
 ﻿.idea*
 .credentials/*
 .data/perms_cache
-.message/*
+message/*
 *.pyc
