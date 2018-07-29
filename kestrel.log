@@ -1,26 +1,2 @@
-Task exception was never retrieved
-future: <Task finished coro=<Client._run_event() done, defined at /home/matthew/anaconda3/envs/kestrel/lib/python3.6/site-packages/discord/client.py:304> exception=SystemExit()>
-Traceback (most recent call last):
-  File "/home/matthew/anaconda3/envs/kestrel/lib/python3.6/site-packages/discord/client.py", line 519, in run
-    self.loop.run_until_complete(self.start(*args, **kwargs))
-  File "/home/matthew/anaconda3/envs/kestrel/lib/python3.6/asyncio/base_events.py", line 454, in run_until_complete
-    self.run_forever()
-  File "/home/matthew/anaconda3/envs/kestrel/lib/python3.6/asyncio/base_events.py", line 421, in run_forever
-    self._run_once()
-  File "/home/matthew/anaconda3/envs/kestrel/lib/python3.6/asyncio/base_events.py", line 1426, in _run_once
-    handle._run()
-  File "/home/matthew/anaconda3/envs/kestrel/lib/python3.6/asyncio/events.py", line 127, in _run
-    self._callback(*self._args)
-  File "/home/matthew/anaconda3/envs/kestrel/lib/python3.6/site-packages/discord/client.py", line 307, in _run_event
-    yield from getattr(self, event)(*args, **kwargs)
-  File "kestrel.py", line 151, in on_message
-    await bot.process_commands(message)
-  File "/home/matthew/anaconda3/envs/kestrel/lib/python3.6/site-packages/discord/ext/commands/bot.py", line 846, in process_commands
-    yield from command.invoke(ctx)
-  File "/home/matthew/anaconda3/envs/kestrel/lib/python3.6/site-packages/discord/ext/commands/core.py", line 374, in invoke
-    yield from injected(*ctx.args, **ctx.kwargs)
-  File "/home/matthew/anaconda3/envs/kestrel/lib/python3.6/site-packages/discord/ext/commands/core.py", line 50, in wrapped
-    ret = yield from coro(*args, **kwargs)
-  File "/home/matthew/projects/kestrel-bot/cogs/core.py", line 14, in quit
-    sys.exit()
-SystemExit
+2018-07-29 00:43:05.610000: Akharis in #general (ATG2):k.mute <@134411181510098945>
+2018-07-29 00:43:17.818000: Akharis in #general (ATG2):k.unmute <@134411181510098945>

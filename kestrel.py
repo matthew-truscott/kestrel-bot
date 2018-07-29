@@ -1,3 +1,9 @@
+"""
+KESTREL_BOT: A discord bot loosely based off https://github.com/Cog-Creators/Red-DiscordBot
+
+Authors: Matthew Truscott (matthew.a.truscott@gmail.com)
+"""
+
 import sys
 import os
 import logging
@@ -7,19 +13,24 @@ import json
 from collections import Counter
 from discord.ext import commands
 
-
+"""
+Credentials for accessing certain APIs
+"""
 def load_credentials():
     with open(os.path.join(CREDENTIALS_DIR, 'credentials.json')) as f:
         return json.load(f)
 
-
+"""
+Persistence information for the bot. Currently stores a message counter so that messages are logged into new files
+TODO: store messages more tidily (currently creates a new log file regardless of length of previous one when bot is
+started
+"""
 def load_persistence():
     with open(os.path.join(DATA_DIR, 'persistence.json'), 'r+') as f:
         pers_dict = json.load(f)
         int_message = int(pers_dict['message_count'])
         int_message += 1
         pers_dict['message_count'] = "%i" % (int_message)
-
         f.seek(0)
         json.dump(pers_dict, f, indent=4)
         f.truncate()
@@ -36,8 +47,10 @@ JSON_COUNTER = 0
 persistence = load_persistence()
 JSON_MESSAGE = int(persistence['message_count'])
 message_dict = {}
-RECORD_MESSAGES = False
+RECORD_MESSAGES = True
 
+
+# bot is modular, see cogs for special commands
 initial_extensions = [
     'cogs.core', 'cogs.modactions'
 ]
