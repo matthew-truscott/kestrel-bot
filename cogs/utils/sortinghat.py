@@ -206,6 +206,7 @@ def main():
 
     # Retrieve Survey Results #
     scope = ['https://www.googleapis.com/auth/spreadsheets']
+    print(os.path.join(CREDENTIALS_DIR, 'client_secret_survey.json'))
     creds = ServiceAccountCredentials.from_json_keyfile_name(
         os.path.join(CREDENTIALS_DIR, 'client_secret_survey.json'), scope)
     client = gspread.authorize(creds)
