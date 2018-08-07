@@ -47,7 +47,8 @@ class CalendarCog(object):
         self.service = discovery.build('calendar', 'v3', http=http)
         self.now = datetime.datetime.utcnow().isoformat() + 'Z'
 
-    def getNextEvents(self, number)
+    def getNextEvents(self, number):
+        pass
 
 
 def main():
