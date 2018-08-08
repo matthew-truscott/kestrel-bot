@@ -169,18 +169,44 @@ class BattleSim(object):
         # --- GATHER ----------------------------------------------------------
         with open(os.path.join(DATA_DIR, 'terrain.json'), 'r') as f:
             terrain_dict = json.load(f)
+        with open(os.path.join(DATA_DIR, 'items.json'), 'r') as f:
+            item_dict = json.load(f)
+        with open(os.path.join(DATA_DIR, 'events.json'), 'r') as f:
+            event_dict = json.load(f)
         # get terrain
         tkey = self.bmap.terrain[px, py]
         #print(terrain_dict["%i" % (tkey)]["name"])
         tval = terrain_dict["%i" % (tkey)]
 
-        # forage
-        fval = tval["forage"]
-        fcont = fval["content"]
-        fresult = random.choice(fcont)
-        #print(fresult)
+        # check event
+        p_event = tval["p_event"]
+        if random.random() < p_event:
+            vval = tval["event"]
+            vcont = vval["id"]
 
-        # 
+
+
+        # otherwise forage
+        else:
+            fval = tval["forage"]
+            fcont = fval["content"]
+            fresult = random.random()
+            item = None
+            f_iter = 0
+            p = fval["p"]
+            p_total = sum(fval["p"])
+            while fresult > 0.0:
+                if fresult < (p[f_iter] / p_total):
+                    fresult = -1
+                    item = fcont[f_iter]
+                else:
+                    f_iter += 1
+                    fresult -= (p[f_iter] / p_total)
+            print(item)
+
+
+
+        #
 
 
 
