@@ -1,5 +1,5 @@
 import numpy as np
-import br_vec as vec
+import game.br_vec as vec
 import math
 import random
 
@@ -15,7 +15,7 @@ def random_walk(vec2_p, box_width, box_height, pull):
     angle_variance = 1 # change to increase or decrease movement predictability
     dx = 0
     dy = 0
-    origin = vec.vec2(box_width / 2, box_height / 2)
+    origin = vec.vec2((box_width-1) / 2, (box_height-1) / 2)
     #print(origin)
     pull_dir = diff(origin, vec2_p)
     #print('dir', pull_dir)

@@ -20,18 +20,20 @@ class BattleSim(object):
     CLASS BattleSim: battle royale simulator, uses a lot of libraries in game folder
     """
     def __init__(self, testing):
-        self.bmap = mp.BattleMap(2, 3)
-        self.primeList = sp.primerange(0, 100)
+        self.bmap = mp.BattleMap(4, 4)
+        self.primeList = list(sp.primerange(0, 100))
         self.p_ch = OrderedDict()
         self.time = 0
-        self.rel_matrix = None
+        self.rel_matrix = {}
+        self.message = ""
 
     def makeBattle(self):
+        print(self.primeList)
         # open the character datafile, load in character data
         with open(os.path.join(DATA_DIR, 'p_characters.csv')) as csvFile:
             csvRead = csv.reader(csvFile)
             self.p_ch.clear()
-            for idx, row in enumerate(csvRead):
+            for row in csvRead:
                 name = row[0]
                 energy = 10
                 warmth = 10
@@ -46,22 +48,39 @@ class BattleSim(object):
                     id = 1
 
                 self.p_ch[id] = gc.Character(name, energy, warmth, sanity, health)
-                randX = random.randint(0, self.map.h-1)
-                randY = random.randint(0, self.map.w-1)
-                self.p_ch[id].set_position(vec.vec2(randX, randY))
+                rx = random.randint(0, self.bmap.h-1)
+                ry = random.randint(0, self.bmap.w-1)
+                self.p_ch[id].set_position(rx, ry)
+                self.p_ch[id].id = id
 
-                if self.bmap.grid[randX, randY] == -1:
-                    self.bmap.grid[randX, randY] = self.primeList[idx]
+                if self.bmap.grid[rx, ry] == -1:
+                    self.bmap.grid[rx, ry] = int(self.primeList[id])
                 else:
-                    self.bmap.grid[randX, randY] *= self.primeList[idx]
+                    self.bmap.grid[rx, ry] = int(self.bmap.grid[rx, ry] * self.primeList[id])
 
-        self.rel_matrix = np.zeros((len(self.p_ch), len(self.p_ch)), dtype=float)
+        for key, val in self.p_ch.items():
+            self.rel_matrix[key] = {}
+            for rkey, rval in self.p_ch.items():
+                if key == rkey:
+                    self.rel_matrix[key][rkey] = val.sanity
+                else:
+                    self.rel_matrix[key][rkey] = 0
 
     def getCharFromMap(self, x, y):
-        # TODO do this
+        i = 0
+        content = self.bmap.grid[x, y]
+        outlist = []
+        while content > 1 and i < len(self.p_ch):
+            # try dividing by prime
+            if content % self.primeList[i+1] == 0:
+                content /= self.primeList[i+1]
+                outlist.append(self.p_ch[i+1])
+            i += 1
+        return outlist
 
     def interact(self, personList):
         # TODO code interaction
+        pass
 
     def nextTurn(self):
         self.time += 1
@@ -72,190 +91,34 @@ class BattleSim(object):
         # to move or not to move, energy loss, dead?
         for idx, person in self.p_ch.items():
             if person.alive:
-                print("Map dimensions:", self.mapWidth, self.mapHeight)
+                print("Map dimensions:", self.bmap.w, self.bmap.h)
                 print("moving", person.name)
                 print("initial", person.position)
-                rowPos = person.position[0]
-                colPos = person.position[1]
-                choose = random.random()
-                # print("dirtest", choose)
+                px = person.position.x
+                py = person.position.y
                 movetest = random.random()
-                # print("movetest", movetest)
 
-                if self.map[rowPos][colPos] == self.primeList[idx]:
-                    self.map[rowPos][colPos] = -1
+                #print('compare', self.bmap.grid[px, py], self.primeList[idx])
+                if self.bmap.grid[px, py] == self.primeList[idx]:
+                    self.bmap.grid[px, py] = -1
                 else:
-                    self.map[rowPos][colPos] /= self.primeList[idx]
+                    self.bmap.grid[px, py] /= self.primeList[idx]
 
                 if movetest < p_move:
-                    # print('moving')
-                    if rowPos == 0:
-                        # top row
-                        # print('toprow')
-                        if colPos == 0:
-                            # top left corner
-                            # print('topleft')
-                            if self.mapWidth < 2:
-                                # 1 column
-                                # print('1 column')
-                                if self.mapHeight < 2:
-                                    # 1 cell, no movement possible
-                                    pass
-                                else:
-                                    # can only move down
-                                    rowPos += 1
-                            else:
-                                if self.mapHeight < 2:
-                                    # can only move right
-                                    colPos += 1
-                                else:
-                                    if choose < 0.4:
-                                        rowPos += 1
-                                    elif choose < 0.8:
-                                        colPos += 1
-                                    else:
-                                        rowPos += 1
-                                        colPos += 1
-                        elif colPos == self.mapWidth-1:
-                            # top right corner
-                            if self.mapHeight < 2:
-                                # can only move left
-                                colPos -= 1
-                            else:
-                                if choose < 0.4:
-                                    rowPos += 1
-                                elif choose < 0.8:
-                                    colPos -= 1
-                                else:
-                                    rowPos += 1
-                                    colPos -= 1
-                        else:
-                            # top side
-                            if self.mapHeight < 2:
-                                # can only move left/right
-                                if choose < 0.5:
-                                    colPos += 1
-                                else:
-                                    colPos -= 1
-                            else:
-                                if choose < 0.25:
-                                    colPos -= 1
-                                elif choose < 0.5:
-                                    colPos += 1
-                                elif choose < 0.75:
-                                    rowPos += 1
-                                elif choose < 0.875:
-                                    rowPos += 1
-                                    colPos -= 1
-                                else:
-                                    rowPos += 1
-                                    colPos += 1
-                    elif rowPos == self.mapHeight-1:
-                        # bottom row
-                        if colPos == 0:
-                            # bottom left
-                            if self.mapWidth == 1:
-                                # one column
-                                rowPos -= 1
-                            else:
-                                if choose < 0.4:
-                                    rowPos -= 1
-                                elif choose < 0.8:
-                                    colPos += 1
-                                else:
-                                    rowPos -= 1
-                                    colPos += 1
-                        elif colPos == self.mapWidth-1:
-                            # bottom right
-                            if choose < 0.4:
-                                rowPos -= 1
-                            elif choose < 0.8:
-                                colPos -= 1
-                            else:
-                                rowPos -= 1
-                                colPos -= 1
-                        else:
-                            # bottom row
-                            if choose < 0.25:
-                                rowPos -= 1
-                            elif choose < 0.5:
-                                colPos -= 1
-                            elif choose < 0.75:
-                                colPos += 1
-                            elif choose < 0.875:
-                                rowPos -= 1
-                                colPos -= 1
-                            else:
-                                rowPos -= 1
-                                colPos += 1
-                    else:
-                        # check if on first or last column
-                        if colPos == 0:
-                            # left column
-                            if choose < 0.25:
-                                rowPos -= 1
-                            if choose < 0.5:
-                                rowPos += 1
-                            if choose < 0.75:
-                                colPos += 1
-                            if choose < 0.875:
-                                colPos += 1
-                                rowPos -= 1
-                            else:
-                                colPos += 1
-                                rowPos += 1
-                        elif colPos == self.mapWidth-1:
-                            # right column
-                            if choose < 0.25:
-                                rowPos -= 1
-                            if choose < 0.5:
-                                rowPos += 1
-                            if choose < 0.75:
-                                colPos -= 1
-                            if choose < 0.875:
-                                colPos -= 1
-                                rowPos -= 1
-                            else:
-                                colPos -= 1
-                                rowPos += 1
-                        else:
-                            # general cases
-                            if choose < 0.15:
-                                rowPos -= 1
-                            elif choose < 0.3:
-                                rowPos += 1
-                            elif choose < 0.45:
-                                colPos -= 1
-                            elif choose < 0.6:
-                                colPos += 1
-                            elif choose < 0.7:
-                                rowPos -= 1
-                                colPos -= 1
-                            elif choose < 0.8:
-                                rowPos -= 1
-                                colPos += 1
-                            elif choose < 0.9:
-                                rowPos += 1
-                                colPos -= 1
-                            else:
-                                rowPos += 1
-                                colPos += 1
-
+                    mv.random_walk(person.position, self.bmap.w, self.bmap.h, 0.4)
                     person.energy -= 2
                 else:
                     person.energy -= 1
 
-                #print("row, col", rowPos, colPos)
-
-                person.position[0] = rowPos
-                person.position[1] = colPos
                 print("moved?", person.position)
-                # print()
 
-                if self.map[rowPos][colPos] == -1:
-                    self.map[rowPos][colPos] = self.primeList[idx]
+                px = person.position.x
+                py = person.position.y
+
+                if self.bmap.grid[px, py] == -1:
+                    self.bmap.grid[px, py] = self.primeList[idx]
                 else:
-                    self.map[rowPos][colPos] *= self.primeList[idx]
+                    self.bmap.grid[px, py] *= self.primeList[idx]
 
                 person.active = True
 
@@ -264,30 +127,65 @@ class BattleSim(object):
         for idx, person in self.p_ch.items():
             if person.alive and person.active:
                 # get position
-                row = person.position[0]
-                col = person.position[1]
-                charlist = self.getCharFromMap(row, col)
-                if len(charlist) > 1:
-                    # code if we limit to 1-1 interactions
-                    # choosetarget = random.randint(1, len(charlist)-1)
-                    # choice = len(charlist) - 1
-                    # for target in charlist:
-                    #    if (choosetarget == choice and
-                    #        target.alive and not person.id == target.id):
-                    #        # some kind of interaction is inevitable
-                    #        self.interact2(person, target)
-                    #    choice -= 1
-
-                    # for multi-interactions
-                    #self.interact(charlist)
-
+                px = person.position.x
+                py = person.position.y
+                charlist = self.getCharFromMap(px, py)
+                if len(charlist) == 0:
+                    # this should never happen
+                    print('event checking found noone where a person should have been')
+                    continue
+                elif len(charlist) == 1:
+                    # solo interactions
+                    self.interact_solo(charlist[0])
+                elif len(charlist) == 2:
+                    # duo interactions
+                    pass
+                else:
+                    # multi interactions
                     pass
 
-# gather, prepare, eat
+        # debug, eventually output to bot
+        print(self.message)
+        self.message = ""
 
-    def printMap(self):
-        print('\n'.join([''.join(['{:4}'.format(item) for item in row])
-            for row in self.map]))
+    def interact_solo(self, person):
+        print('id', person.id)
+        print(self.rel_matrix[person.id][person.id])
+        if self.rel_matrix[person.id][person.id] <= -10:
+            # suicide
+            self.message += "%s killed themselves due to insanity\n" % (person.name)
+            person.alive = False
+        px = person.position.x
+        py = person.position.y
+
+        """
+        A typical turn goes as follows:
+        - gather (either in the wild or in an urban setting where one can loot) (event chance)
+        - prepare (event chance if none already)
+        - eat
+        - sleep
+        """
+
+        # --- GATHER ----------------------------------------------------------
+        with open(os.path.join(DATA_DIR, 'terrain.json'), 'r') as f:
+            terrain_dict = json.load(f)
+        # get terrain
+        tkey = self.bmap.terrain[px, py]
+        #print(terrain_dict["%i" % (tkey)]["name"])
+        tval = terrain_dict["%i" % (tkey)]
+
+        # forage
+        fval = tval["forage"]
+        fcont = fval["content"]
+        fresult = random.choice(fcont)
+        #print(fresult)
+
+        # 
+
+
+
+
+
 
 
 class BattleCog(object):
@@ -306,6 +204,6 @@ class BattleCog(object):
 if __name__ == '__main__':
     b = BattleSim(1)
     b.makeBattle()
-    b.printMap()
+    print(b.bmap.grid)
     b.nextTurn()
-    b.printMap()
+    print(b.bmap.grid)

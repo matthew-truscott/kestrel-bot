@@ -1,0 +1,11 @@
+{
+  "1": {
+    "id": 1,
+    "name": "wasteland",
+    "forage": {
+      "total": 10,
+      "content": ["rat"],
+      "p": [10]
+    }
+  }
+}

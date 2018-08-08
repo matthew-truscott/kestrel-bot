@@ -1,4 +1,4 @@
-import br_vec as vec
+import game.br_vec as vec
 
 class Character(object):
     def __init__(self, name,
