@@ -11,6 +11,7 @@ import game.character as gc
 import game.br_vec as vec
 import game.br_move as mv
 import game.br_map as mp
+import game.br_json as js
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 DATA_DIR = os.path.join(ROOT_DIR, 'data')
@@ -26,6 +27,7 @@ class BattleSim(object):
         self.time = 0
         self.rel_matrix = {}
         self.message = ""
+        self.pull = 0
 
     def makeBattle(self):
         print(self.primeList)
@@ -84,43 +86,50 @@ class BattleSim(object):
 
     def nextTurn(self):
         self.time += 1
-        p_move = 0.6
+        self.pull += 0.1
 
         ## TODO redo everything below
 
         # to move or not to move, energy loss, dead?
         for idx, person in self.p_ch.items():
-            if person.alive:
-                print("Map dimensions:", self.bmap.w, self.bmap.h)
-                print("moving", person.name)
-                print("initial", person.position)
-                px = person.position.x
-                py = person.position.y
-                movetest = random.random()
+            if not person.alive:
+                continue
 
-                #print('compare', self.bmap.grid[px, py], self.primeList[idx])
-                if self.bmap.grid[px, py] == self.primeList[idx]:
-                    self.bmap.grid[px, py] = -1
+            print("Map dimensions:", self.bmap.w, self.bmap.h)
+            print("moving", person.name)
+            print("initial", person.position)
+            px = person.position.x
+            py = person.position.y
+            movetest = random.random()
+            pmove = (self.pull + (person.energy / 10)) / (person.shelter + 1)
+
+            #print('compare', self.bmap.grid[px, py], self.primeList[idx])
+            if self.bmap.grid[px, py] == self.primeList[idx]:
+                self.bmap.grid[px, py] = -1
+            else:
+                self.bmap.grid[px, py] /= self.primeList[idx]
+
+            if movetest < pmove and person.energy > 1:
+                if self.pull > 1:
+                    ppull = 1
                 else:
-                    self.bmap.grid[px, py] /= self.primeList[idx]
+                    ppull = self.pull
+                mv.random_walk(person.position, self.bmap.w, self.bmap.h, ppull)
+                person.energy -= 2
+            else:
+                person.energy -= 1
 
-                if movetest < p_move:
-                    mv.random_walk(person.position, self.bmap.w, self.bmap.h, 0.4)
-                    person.energy -= 2
-                else:
-                    person.energy -= 1
+            print("moved?", person.position)
 
-                print("moved?", person.position)
+            px = person.position.x
+            py = person.position.y
 
-                px = person.position.x
-                py = person.position.y
+            if self.bmap.grid[px, py] == -1:
+                self.bmap.grid[px, py] = self.primeList[idx]
+            else:
+                self.bmap.grid[px, py] *= self.primeList[idx]
 
-                if self.bmap.grid[px, py] == -1:
-                    self.bmap.grid[px, py] = self.primeList[idx]
-                else:
-                    self.bmap.grid[px, py] *= self.primeList[idx]
-
-                person.active = True
+            person.active = True
 
         # discovery, person or event
         # first see if there's another person on the space
@@ -143,6 +152,20 @@ class BattleSim(object):
                 else:
                     # multi interactions
                     pass
+
+        # check if dead
+        for idx, person in self.p_ch.items():
+            if person.alive:
+                if person.health <= 0:
+                    print(person.name, "died somehow")
+                    person.alive = False
+                elif person.energy <= 0:
+                    print(person.name, "died of hunger")
+                    person.alive = False
+                elif person.warmth <= 0:
+                    print(person.name, "died of hypothermia")
+                    person.alive = False
+
 
         # debug, eventually output to bot
         print(self.message)
@@ -180,33 +203,71 @@ class BattleSim(object):
 
         # check event
         p_event = tval["p_event"]
-        if random.random() < p_event:
-            vval = tval["event"]
-            vcont = vval["id"]
-
+        if random.random() < (p_event / 100):
+            event = js.get_random_element(tval, "event")
+            event_obj = event_dict["%i" % (event)]
+            print("event", event_obj["name"])
+            # if event is disaster, apply effects on player, unless they are sheltered or protected
+            # if sheltered, apply damage to health on shelter
+            # if not sheltered but protected, apply damage to health on protection
+            if event_obj["category"] == "disaster":
+                if "health" in event_obj:
+                    h = event_obj["health"]
+                    if h < 0:
+                        if person.shelter == 0:
+                            if person.protection == 0:
+                                person.affect(event_obj)
+                            else:
+                                person.protection += h
+                                if person.protection < 0:
+                                    person.protection = 0
+                        else:
+                            person.shelter += h
+                            if person.shelter < 0:
+                                person.shelter = 0
+                print("damage dealt by disaster", person.health, person.protection, person.shelter)
 
 
         # otherwise forage
         else:
-            fval = tval["forage"]
-            fcont = fval["content"]
-            fresult = random.random()
-            item = None
-            f_iter = 0
-            p = fval["p"]
-            p_total = sum(fval["p"])
-            while fresult > 0.0:
-                if fresult < (p[f_iter] / p_total):
-                    fresult = -1
-                    item = fcont[f_iter]
+            item = js.get_random_element(tval, "forage")
+            item_obj = item_dict["%i" % (item)]
+            print("item", item_obj["name"])
+            # if forage is junk, check if space and equip if possible
+            if item_obj["category"] == "junk":
+                print("junk")
+                ia = person.add_item(item_obj)
+                if ia > 0:
+                    print("inventory full")
                 else:
-                    f_iter += 1
-                    fresult -= (p[f_iter] / p_total)
-            print(item)
+                    print("picked up item")
+            # if forage is food, check if space and equip, or eat if not possible
+            elif item_obj["category"] == "food":
+                print("food")
+                ia = person.add_item(item_obj)
+                if ia > 0:
+                    person.eat_food(item_obj)
+                    print("ate food")
+                else:
+                    print("picked up food")
+            # if forage is meat, check if space and equip, or eat if hunger/sanity is critical
+            elif item_obj["category"] == "meat":
+                print("meat")
+                ia = person.add_item(item_obj)
+                if ia > 0 and (person.hunger < 3 or person.sanity < 3):
+                    person.eat_rawfood(item_obj)
+                    print("ate raw meat")
+                else:
+                    print("picked up meat")
+            elif item_obj["category"] == "corpse":
+                print("corpse")
+                ia = person.loot(item_obj)
 
 
 
-        #
+        #sleep
+        person.energy -= 3
+        print("\n")
 
 
 
@@ -230,6 +291,12 @@ class BattleCog(object):
 if __name__ == '__main__':
     b = BattleSim(1)
     b.makeBattle()
+    print(b.bmap.grid)
+    b.nextTurn()
+    print(b.bmap.grid)
+    b.nextTurn()
+    print(b.bmap.grid)
+    b.nextTurn()
     print(b.bmap.grid)
     b.nextTurn()
     print(b.bmap.grid)

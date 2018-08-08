@@ -1,0 +1,18 @@
+{
+  "1": {
+    "id": 1,
+    "name": "wanderer_corpse",
+    "category": "corpse",
+    "protection": {
+      "content": [0, 2],
+      "p": [50, 10]
+    },
+    "weapon": {
+      "content": [0, 3, 4],
+      "p": [30, 10, 10]
+    },
+    "junk": {
+      "content": [0, 5, 6],
+      "p": [10, 10, 10]
+  }
+}

@@ -4,11 +4,11 @@
     "name": "wasteland",
     "p_event": 30,
     "forage": {
-      "content": ["rat"],
+      "content": [1],
       "p": [10]
     },
     "event": {
-      "id": [1],
+      "content": [1],
       "p": [10]
     }
   }

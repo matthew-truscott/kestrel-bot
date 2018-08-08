@@ -191,6 +191,9 @@ async def on_member_join(member):
         json.dump(data, f, indent=4)
         f.truncate()
 
+    # deploy care package
+    
+
 
 @bot.event
 async def on_member_remove(member):

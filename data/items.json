@@ -1,7 +1,23 @@
 {
+  "0": {
+    "id": 0,
+    "name": "NULL",
+    "category": "none"
+  },
   "1": {
     "id": 1,
     "name": "rat",
-    
+    "category": "meat",
+    "carry": 1,
+    "health_raw": -3,
+    "sanity_raw": -1,
+    "energy_raw": 2,
+    "health": 1,
+    "energy": 3
+  },
+  "2": {
+    "id": 2,
+    "name": "padded_shirt",
+    "protection": 2
   }
 }

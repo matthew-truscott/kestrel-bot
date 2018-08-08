@@ -1,7 +1,8 @@
 {
   "1": {
     "id": 1,
-    "name": "rat",
-
+    "name": "duststorm",
+    "category": "disaster",
+    "health": -1
   }
 }
