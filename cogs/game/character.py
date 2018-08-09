@@ -104,6 +104,11 @@ class Character(object):
             if self.health > self.maxhealth:
                 self.health = self.maxhealth
 
+    def clean_inventory(self, carry):
+        # if an item of carry is introduced, often will want an intelligent way of cleaning up the inventory so the
+        # least valuable thing is thrown, value per carry
+
+
     def loot(self, corpse):
         if "protection_chest" in corpse:
             item = js.get_random_element(corpse["protection"])
@@ -119,4 +124,6 @@ class Character(object):
                 # equip if better range, keep old weapon if it has more damage
                 # else loot if better damage
                 # loot if current weapon(s) are non-perma
-                
+                # if overlimit, run inventory handling first
+                if self.weapon.range <= item["range"]:
+                    self.weapon = item

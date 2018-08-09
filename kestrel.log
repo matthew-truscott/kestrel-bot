@@ -1,0 +1,26 @@
+Task exception was never retrieved
+future: <Task finished coro=<Client._run_event() done, defined at C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\site-packages\discord\client.py:304> exception=SystemExit()>
+Traceback (most recent call last):
+  File "C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\site-packages\discord\client.py", line 519, in run
+    self.loop.run_until_complete(self.start(*args, **kwargs))
+  File "C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\asyncio\base_events.py", line 455, in run_until_complete
+    self.run_forever()
+  File "C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\asyncio\base_events.py", line 422, in run_forever
+    self._run_once()
+  File "C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\asyncio\base_events.py", line 1434, in _run_once
+    handle._run()
+  File "C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\asyncio\events.py", line 145, in _run
+    self._callback(*self._args)
+  File "C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\site-packages\discord\client.py", line 307, in _run_event
+    yield from getattr(self, event)(*args, **kwargs)
+  File "kestrel.py", line 185, in on_message
+    await bot.process_commands(message)
+  File "C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
+    yield from command.invoke(ctx)
+  File "C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\site-packages\discord\ext\commands\core.py", line 374, in invoke
+    yield from injected(*ctx.args, **ctx.kwargs)
+  File "C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
+    ret = yield from coro(*args, **kwargs)
+  File "I:\projects\kestrel-bot\cogs\core.py", line 20, in quit
+    sys.exit()
+SystemExit

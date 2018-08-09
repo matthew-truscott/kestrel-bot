@@ -120,46 +120,68 @@ async def on_command(command, ctx):
 
 @bot.event
 async def on_message(message):
-    if not message.author.bot:
-        if RECORD_MESSAGES:
-            global JSON_COUNTER
-            global JSON_MESSAGE
-            global message_dict
+    # if not message.author.bot:
+    #     if RECORD_MESSAGES:
+    #         global JSON_COUNTER
+    #         global JSON_MESSAGE
+    #         global message_dict
+    #
+    #         if JSON_COUNTER < JSON_LIMIT:
+    #             JSON_COUNTER += 1
+    #             #persistence['index'] = "%i" % (JSON_COUNTER)
+    #
+    #         else:
+    #             JSON_COUNTER = 0
+    #             #persistence['index'] = "%i" % (JSON_COUNTER)
+    #
+    #             JSON_MESSAGE += 1
+    #             persistence['message_count'] = "%i" % (JSON_MESSAGE)
+    #
+    #             per_path = os.path.join(DATA_DIR, 'persistence.json')
+    #             with open(per_path, 'w') as fp:
+    #                 json.dump(persistence, fp)
+    #
+    #             path = os.path.join(MESSAGE_DIR,
+    #                                 'messagelog%i.json' % (JSON_MESSAGE))
+    #             with open(path, 'w+') as fl:
+    #                 json.dump(message_dict, fl)
+    #             message_dict = {}
+    #
+    #         entry = "entry-%i-%i" % (JSON_MESSAGE, JSON_COUNTER)
+    #         message_dict[entry] = {
+    #             "channel": message.channel.name,
+    #             "timestamp": str(message.timestamp),
+    #             "author": message.author.name,
+    #             "contents": message.content
+    #         }
+    #         path = os.path.join(MESSAGE_DIR,
+    #                             'messagelog%i.json' % (JSON_MESSAGE))
+    #         with open(path, 'w+') as fl:
+    #             json.dump(message_dict, fl)
+    # else:
+    #     return
 
-            if JSON_COUNTER < JSON_LIMIT:
-                JSON_COUNTER += 1
-                #persistence['index'] = "%i" % (JSON_COUNTER)
+    if message.server is None and not message.author == bot.user:
+        # read message
+        if message.content == "sort me":
+            print("sorting")
+            with open(os.path.join(DATA_DIR, 'userbase.json'), 'r+') as f:
+                data = json.load(f)
 
-            else:
-                JSON_COUNTER = 0
-                #persistence['index'] = "%i" % (JSON_COUNTER)
-
-                JSON_MESSAGE += 1
-                persistence['message_count'] = "%i" % (JSON_MESSAGE)
-
-                per_path = os.path.join(DATA_DIR, 'persistence.json')
-                with open(per_path, 'w') as fp:
-                    json.dump(persistence, fp)
-
-                path = os.path.join(MESSAGE_DIR,
-                                    'messagelog%i.json' % (JSON_MESSAGE))
-                with open(path, 'w+') as fl:
-                    json.dump(message_dict, fl)
-                message_dict = {}
-
-            entry = "entry-%i-%i" % (JSON_MESSAGE, JSON_COUNTER)
-            message_dict[entry] = {
-                "channel": message.channel.name,
-                "timestamp": str(message.timestamp),
-                "author": message.author.name,
-                "contents": message.content
-            }
-            path = os.path.join(MESSAGE_DIR,
-                                'messagelog%i.json' % (JSON_MESSAGE))
-            with open(path, 'w+') as fl:
-                json.dump(message_dict, fl)
-    else:
-        return
+                if message.author.id in data:
+                    user = data[message.author.id]
+                    if "house" in user and user["house"] is not None:
+                        await bot.send_message(message.author, "It appears you have already been sorted")
+                    else:
+                        fullname = messge.author.name + "#" + str(message.author.discriminator)
+                        # TODO: finish this, need laptop to get client_secret_survey.json
+                else:
+                    await bot.send_message(message.author, "It seems like you are not in the system. Contact Akharis#1903"
+                    "for help regarding this issue.")
+        elif message.content == "k.quit":
+            pass
+        else:
+            print("unrecognized message")
 
     await bot.process_commands(message)
 
@@ -187,12 +209,16 @@ async def on_member_join(member):
                 "joined at": member.joined_at.strftime("%Y, %B %d"),
                 "alive": True
             }
+
+            # first time joining! deploy care package
+            await bot.send_message(member, 'Hi! Welcome to the server. To get started, click on this link: '
+            'https://goo.gl/forms/2Fq6Pnvab9DUCJWB2. When you have completed the survey, reply to this message with'
+            ' "sort me". Thank you for your time.')
+
+
         f.seek(0)
         json.dump(data, f, indent=4)
         f.truncate()
-
-    # deploy care package
-    
 
 
 @bot.event
