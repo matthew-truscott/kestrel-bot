@@ -30,7 +30,7 @@ class BattleSim(object):
         self.pull = 0
 
     def makeBattle(self):
-        print(self.primeList)
+        #print(self.primeList)
         # open the character datafile, load in character data
         with open(os.path.join(DATA_DIR, 'p_characters.csv')) as csvFile:
             csvRead = csv.reader(csvFile)
@@ -86,6 +86,8 @@ class BattleSim(object):
 
     def nextTurn(self):
         self.time += 1
+        print("##############################################################")
+        print("TIME", self.time)
         self.pull += 0.1
 
         ## TODO redo everything below
@@ -95,9 +97,9 @@ class BattleSim(object):
             if not person.alive:
                 continue
 
-            print("Map dimensions:", self.bmap.w, self.bmap.h)
-            print("moving", person.name)
-            print("initial", person.position)
+            #print("Map dimensions:", self.bmap.w, self.bmap.h)
+            #print("moving", person.name)
+            #print("initial", person.position)
             px = person.position.x
             py = person.position.y
             movetest = random.random()
@@ -119,7 +121,7 @@ class BattleSim(object):
             else:
                 person.energy -= 1
 
-            print("moved?", person.position)
+            #print("moved?", person.position)
 
             px = person.position.x
             py = person.position.y
@@ -196,6 +198,8 @@ class BattleSim(object):
             item_dict = json.load(f)
         with open(os.path.join(DATA_DIR, 'events.json'), 'r') as f:
             event_dict = json.load(f)
+        with open(os.path.join(DATA_DIR, 'loot.json'), 'r') as f:
+            loot_dict = json.load(f)
         # get terrain
         tkey = self.bmap.terrain[px, py]
         #print(terrain_dict["%i" % (tkey)]["name"])
@@ -232,19 +236,16 @@ class BattleSim(object):
         else:
             item = js.get_random_element(tval, "forage")
             item_obj = item_dict["%i" % (item)]
-            print("item", item_obj["name"])
+            if "name" in item_obj:
+                print("item", item_obj["name"])
             # if forage is junk, check if space and equip if possible
             if item_obj["category"] == "junk":
                 print("junk")
-                ia = person.add_item(item_obj)
-                if ia > 0:
-                    print("inventory full")
-                else:
-                    print("picked up item")
+                ia = person.add_item(item_obj, item_dict)
             # if forage is food, check if space and equip, or eat if not possible
             elif item_obj["category"] == "food":
                 print("food")
-                ia = person.add_item(item_obj)
+                ia = person.add_item(item_obj, item_dict)
                 if ia > 0:
                     person.eat_food(item_obj)
                     print("ate food")
@@ -253,7 +254,7 @@ class BattleSim(object):
             # if forage is meat, check if space and equip, or eat if hunger/sanity is critical
             elif item_obj["category"] == "meat":
                 print("meat")
-                ia = person.add_item(item_obj)
+                ia = person.add_item(item_obj, item_dict)
                 if ia > 0 and (person.hunger < 3 or person.sanity < 3):
                     person.eat_rawfood(item_obj)
                     print("ate raw meat")
@@ -261,13 +262,16 @@ class BattleSim(object):
                     print("picked up meat")
             elif item_obj["category"] == "corpse":
                 print("corpse")
-                ia = person.loot(item_obj)
+                # get corpse and randomise loot
+                corpse = loot_dict["%i" % (item_obj["cross-id"])]
+                ia = person.loot(corpse, item_dict)
+                person.show_inventory(item_dict)
 
 
 
         #sleep
         person.energy -= 3
-        print("\n")
+        print("--------------------------------------------------------------")
 
 
 

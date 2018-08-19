@@ -16,7 +16,8 @@
         "display name": "Akharis",
         "joined at": "2017, October 29",
         "alive": true,
-        "dev": true
+        "dev": true,
+        "house": "House Scriabin"
     },
     "306916536793169920": {
         "name": "kestrel-bot",

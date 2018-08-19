@@ -1,3 +1,5 @@
+Task was destroyed but it is pending!
+task: <Task pending coro=<background_main() running at I:\projects\kestrel-bot\cogs\background.py:14> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x000001BEFD4BDA68>()]>>
 Task exception was never retrieved
 future: <Task finished coro=<Client._run_event() done, defined at C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\site-packages\discord\client.py:304> exception=SystemExit()>
 Traceback (most recent call last):
@@ -13,7 +15,7 @@ Traceback (most recent call last):
     self._callback(*self._args)
   File "C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\site-packages\discord\client.py", line 307, in _run_event
     yield from getattr(self, event)(*args, **kwargs)
-  File "kestrel.py", line 185, in on_message
+  File "kestrel.py", line 168, in on_message
     await bot.process_commands(message)
   File "C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\site-packages\discord\ext\commands\bot.py", line 846, in process_commands
     yield from command.invoke(ctx)
@@ -21,6 +23,6 @@ Traceback (most recent call last):
     yield from injected(*ctx.args, **ctx.kwargs)
   File "C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\site-packages\discord\ext\commands\core.py", line 50, in wrapped
     ret = yield from coro(*args, **kwargs)
-  File "I:\projects\kestrel-bot\cogs\core.py", line 20, in quit
+  File "I:\projects\kestrel-bot\cogs\core.py", line 29, in quit
     sys.exit()
 SystemExit

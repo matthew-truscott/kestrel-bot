@@ -12,6 +12,9 @@ import datetime
 import json
 from collections import Counter
 from discord.ext import commands
+import discord
+import cogs.utils.sortinghat as ush
+import cogs.background as bg
 
 """
 Credentials for accessing certain APIs
@@ -161,27 +164,6 @@ async def on_message(message):
     # else:
     #     return
 
-    if message.server is None and not message.author == bot.user:
-        # read message
-        if message.content == "sort me":
-            print("sorting")
-            with open(os.path.join(DATA_DIR, 'userbase.json'), 'r+') as f:
-                data = json.load(f)
-
-                if message.author.id in data:
-                    user = data[message.author.id]
-                    if "house" in user and user["house"] is not None:
-                        await bot.send_message(message.author, "It appears you have already been sorted")
-                    else:
-                        fullname = messge.author.name + "#" + str(message.author.discriminator)
-                        # TODO: finish this, need laptop to get client_secret_survey.json
-                else:
-                    await bot.send_message(message.author, "It seems like you are not in the system. Contact Akharis#1903"
-                    "for help regarding this issue.")
-        elif message.content == "k.quit":
-            pass
-        else:
-            print("unrecognized message")
 
     await bot.process_commands(message)
 
@@ -213,7 +195,7 @@ async def on_member_join(member):
             # first time joining! deploy care package
             await bot.send_message(member, 'Hi! Welcome to the server. To get started, click on this link: '
             'https://goo.gl/forms/2Fq6Pnvab9DUCJWB2. When you have completed the survey, reply to this message with'
-            ' "sort me". Thank you for your time.')
+            ' "k.sort". Thank you for your time.')
 
 
         f.seek(0)
@@ -224,15 +206,6 @@ async def on_member_join(member):
 @bot.event
 async def on_member_remove(member):
     print("%s left the server" % (member.name))
-
-
-@commands.command(hidden=True)
-async def quit(self):
-    path = os.path.join(MESSAGE_DIR, 'messagelog%i' % (JSON_MESSAGE))
-    with open(path, 'w') as fl:
-        json.dump(message_dict, fl)
-    sys.exit()
-
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -249,6 +222,7 @@ if __name__ == '__main__':
                 extension, type(e).__name__, e)
             )
 
+    bot.loop.create_task(bg.background_main(bot))
     bot.run(credentials['discord_token'])
     handlers = log.handlers[:]
     for hdlr in handlers:

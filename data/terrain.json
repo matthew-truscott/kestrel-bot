@@ -4,8 +4,8 @@
     "name": "wasteland",
     "p_event": 30,
     "forage": {
-      "content": [1],
-      "p": [10]
+      "content": [1, 7],
+      "p": [10, 5]
     },
     "event": {
       "content": [1],

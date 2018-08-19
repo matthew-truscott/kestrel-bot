@@ -2,7 +2,7 @@
   "0": {
     "id": 0,
     "name": "NULL",
-    "category": "none"
+    "category": "x"
   },
   "1": {
     "id": 1,
@@ -13,11 +13,54 @@
     "sanity_raw": -1,
     "energy_raw": 2,
     "health": 1,
-    "energy": 3
+    "energy": 3,
+    "value": 5
   },
   "2": {
     "id": 2,
     "name": "padded_shirt",
-    "protection": 2
+    "category": "armour",
+    "protection": 2,
+    "carry": 4,
+    "value": 80
+  },
+  "3": {
+    "id": 3,
+    "name": "machete",
+    "category": "weapon",
+    "ammo": 0,
+    "damage": 10,
+    "carry": 2,
+    "range": 1,
+    "value": 50
+  },
+  "4": {
+    "id": 4,
+    "name": "revolver",
+    "category": "weapon",
+    "ammo": 6,
+    "damage": 8,
+    "carry": 1,
+    "range": 5,
+    "value": 80
+  },
+  "5": {
+    "id": 5,
+    "name": "firewood",
+    "category": "junk",
+    "carry": 1,
+    "value": 10
+  },
+  "6": {
+    "id": 6,
+    "name": "rag",
+    "category": "junk",
+    "carry": 1,
+    "value": 10
+  },
+  "7": {
+    "id": 7,
+    "category": "corpse",
+    "cross-id": 1
   }
 }

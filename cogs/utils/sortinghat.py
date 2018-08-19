@@ -198,6 +198,41 @@ def append_sorted(uid):
     with open(os.path.join(DATA_DIR, 'sorted'), 'a+') as f:
         f.write(uid+'\n')
 
+def get_house(uid):
+    # Retrieve Survey Results #
+    scope = ['https://spreadsheets.google.com/feeds',
+             'https://www.googleapis.com/auth/drive']
+    #print(os.path.join(CREDENTIALS_DIR, 'client_secret_survey.json'))
+    creds = ServiceAccountCredentials.from_json_keyfile_name(
+        os.path.join(CREDENTIALS_DIR, 'client_secret_survey.json'), scope)
+    client = gspread.authorize(creds)
+
+    sheet_sort = client.open("Quick_Sort_Responses").sheet1
+    responses = sheet_sort.get_all_records()
+
+    user_record = {}
+
+    for r in responses:
+        if 'What is your Discord Name? Answer in the form of: Username#1234' in r:
+            ucheck = r['What is your Discord Name? Answer in the form of: Username#1234']
+            if uid == ucheck:
+                user_record = r
+                break
+
+    if not user_record:
+        # user not found in survey results, print according error message through kestrel
+        return -1
+    else:
+        house = check_accuracy(r)
+        if house == A1:
+            return 1
+        if house == A2:
+            return 2
+        if house == A3:
+            return 3
+        if house == A4:
+            return 4
+        return 0
 
 def main():
 
@@ -205,8 +240,9 @@ def main():
     sorted_uids = read_sorted()
 
     # Retrieve Survey Results #
-    scope = ['https://www.googleapis.com/auth/spreadsheets']
-    print(os.path.join(CREDENTIALS_DIR, 'client_secret_survey.json'))
+    scope = ['https://spreadsheets.google.com/feeds',
+             'https://www.googleapis.com/auth/drive']
+    #print(os.path.join(CREDENTIALS_DIR, 'client_secret_survey.json'))
     creds = ServiceAccountCredentials.from_json_keyfile_name(
         os.path.join(CREDENTIALS_DIR, 'client_secret_survey.json'), scope)
     client = gspread.authorize(creds)

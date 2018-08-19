@@ -4,7 +4,7 @@ from discord.ext import commands
 import httplib2
 import os
 
-from apiclient import discovery
+from googleapiclient.discovery import build
 from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
