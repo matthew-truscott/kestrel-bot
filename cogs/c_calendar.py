@@ -14,7 +14,7 @@ import datetime
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 CREDENTIALS_DIR = os.path.join(ROOT_DIR, '.credentials')
-CLIENT_SECRET_FILE = os.path.join(CREDENTIALS_DIR, 'google_credentials.json')
+CLIENT_SECRET_FILE = os.path.join(CREDENTIALS_DIR, 'calendar_secret.json')
 APPLICATION_NAME = 'Kestrel Bot Calendar'
 
 
@@ -60,7 +60,7 @@ def main():
 
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
-    service = discovery.build('calendar', 'v3', http=http)
+    service = build('calendar', 'v3', http=http)
 
     now = datetime.datetime.utcnow().isoformat() + 'Z'
     print('Getting the upcoming 10 events')

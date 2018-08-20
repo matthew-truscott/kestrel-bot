@@ -55,7 +55,7 @@ RECORD_MESSAGES = True
 
 # bot is modular, see cogs for special commands
 initial_extensions = [
-    'cogs.core', 'cogs.modactions'
+    'cogs.core', 'cogs.modactions', 'cogs.report'
 ]
 
 # setup log file

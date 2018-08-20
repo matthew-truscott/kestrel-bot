@@ -1,5 +1,5 @@
 Task was destroyed but it is pending!
-task: <Task pending coro=<background_main() running at I:\projects\kestrel-bot\cogs\background.py:14> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x000001BEFD4BDA68>()]>>
+task: <Task pending coro=<background_main() running at I:\projects\kestrel-bot\cogs\background.py:31> wait_for=<Future pending cb=[<TaskWakeupMethWrapper object at 0x00000169157F9618>()]>>
 Task exception was never retrieved
 future: <Task finished coro=<Client._run_event() done, defined at C:\Users\mat0330\AppData\Local\conda\conda\envs\kestrel\lib\site-packages\discord\client.py:304> exception=SystemExit()>
 Traceback (most recent call last):

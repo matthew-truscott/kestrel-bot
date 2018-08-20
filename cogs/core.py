@@ -85,10 +85,6 @@ class CoreCog(object):
                     "for help regarding this issue.")
 
 
-    @commands.command(hidden=True, pass_context=True)
-    async def report(self, ctx, user: discord.Member, *, reason: str = None):
-        message = ctx.message
-        if message.server is None and not message.author == self.bot.user:
 
 
 def setup(bot):
